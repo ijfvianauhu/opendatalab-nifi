@@ -1,4 +1,4 @@
-# opendatalab-nifi
+# Introducción
 
 [Apache NiFi](https://nifi.apache.org/) es una plataforma de integración de datos y automatización de flujos de trabajo diseñada para gestionar, mover y transformar datos entre sistemas diversos de manera eficiente, confiable y en tiempo real. Es un proyecto de código abierto desarrollado por la Fundación Apache, basado en el concepto de "programación por flujo". Dispone de una interfaz web que permite definir estos flujos. Por cuestiones de seguridad, se sugiere no permitir acceso directo desde clientes web a este entorno. En su lugar, se propone el uso de proxies que aislen a [Apache NiFi](https://nifi.apache.org/) del exterior. 
 
@@ -146,13 +146,25 @@ Para realizar el despliegue de nuestro stack ejecutamos
 ./setup.sh start
 ```
 
-Durante este proceso, además de descargarnos las imágenes de los distintos contenedores, se procederá a crear certificados ssl autofirmados para los valores indicados en las variables de entorno `TRAEFIK_NAME` y  `NIFI_NAME`. Si dichos certificados ya existen no los sobreescribirá. Si desea usar sus propios certificados, deberá almacenarlos en el directorio `etc/traefik/certs` y los nombres deberán ser `TRAEFIK_NAME.crt`, `TRAEFIK_NAME.key`, `NIFI_NAME.crt` y `NIFI_NAME.key`. Esto es, en el directorio `etc/traefik/certs` deberemos tener los siguientes ficheros:
+Durante este proceso, además de descargarnos las imágenes de los distintos contenedores, se procederá a crear certificados
+ssl autofirmados para los valores indicados en las variables de entorno `TRAEFIK_NAME` y  `NIFI_NAME`. Si dichos
+certificados ya existen no los sobreescribirá. Si desea usar sus propios certificados, deberá almacenarlos en el 
+directorio `etc/traefik/certs` y los nombres deberán ser `TRAEFIK_NAME.crt`, `TRAEFIK_NAME.key`, `NIFI_NAME.crt` 
+y `NIFI_NAME.key`. Esto es, en el directorio `etc/traefik/certs` deberemos tener los siguientes ficheros:
 
 ```bash
 # ls etc/traefik/certs
 nifi.opendatalab2.uhu.es.crt  proxy.opendatalab2.uhu.es.crt
 nifi.opendatalab2.uhu.es.key  proxy.opendatalab2.uhu.es.key
 ``` 
+
+Una vez finalizado el proceso de despliegue, podremos acceder a nifi en la siguiente dirección:
+
+```
+https://nifi.opendatalab2.uhu.es/
+```
+
+Donde `nifi.opendatalab2.uhu.es/` es el nombre indicado en la variable de entorno `NIFI_NAME`.
 
 ## Consulta de logs
 
