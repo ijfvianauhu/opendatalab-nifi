@@ -1,0 +1,133 @@
+version: "3.3"
+
+services:
+
+  traefik:
+    image: "${TRAEFIK_IMAGE_NAME}:${TRAEFIK_ACTIVE_BRANCH}"
+    hostname: "${TRAEFIK_NAME}"
+    environment:
+        - HTTP_PORT=${TRAEFIK_HTTP_PORT}
+        - HTTPS_PORT=${TRAEFIK_HTTPS_PORT}
+        - PROXY_NETWORKNAME=${COMPOSE_NETWORKNAME}
+        - PROXY_NAME=${TRAEFIK_NAME}
+        - LOG_LEVEL=${TRAEFIK_LOG_LEVEL}
+        - ENABLE_DASHBOARD=${TRAEFIK_ENABLE_DASHBOARD}
+        - PROXY_ADMIN_USER=${TRAEFIK_ADMIN_USER}
+        - PROXY_ADMIN_PASSWORD=${TRAEFIK_ADMIN_PASSWORD}
+    command:
+      - "--log.level=${TRAEFIK_LOG_LEVEL}"
+      - "--api.dashboard=${TRAEFIK_ENABLE_DASHBOARD}"
+      - "--entryPoints.web.address=:${TRAEFIK_HTTP_PORT}"
+      - "--entryPoints.websecure.address=:${TRAEFIK_HTTPS_PORT}"
+      - "--entryPoints.websecure.transport.respondingTimeouts.readTimeout=3600"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.network=${COMPOSE_NETWORKNAME}"
+      - "--providers.file.filename=/etc/traefik/dynamic_conf.yml"
+      - "--providers.file.watch=true"
+      - "--serversTransport.insecureSkipVerify=true"
+    ports:
+      - "${TRAEFIK_HTTP_PORT}:${TRAEFIK_HTTP_PORT}"
+      - "${TRAEFIK_HTTPS_PORT}:${TRAEFIK_HTTPS_PORT}"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "../etc/traefik:/etc/traefik"
+
+  nifi:
+    image: "${NIFI_IMAGE_NAME}:${NIFI_ACTIVE_BRANCH}"
+    hostname: "${NIFI_NAME}"
+    user: "${COMPOSE_USER}:${COMPOSE_GRP}"  
+    expose:
+      - ${NIFI_WEB_HTTP_PORT}:${NIFI_WEB_HTTP_PORT}
+      - ${NIFI_WEB_HTTPS_PORT}:${NIFI_WEB_HTTPS_PORT}
+    environment:
+      - NIFI_WEB_HTTP_PORT=${NIFI_WEB_HTTP_PORT}
+      - NIFI_WEB_HTTPS_PORT=${NIFI_WEB_HTTPS_PORT}
+      - SINGLE_USER_CREDENTIALS_USERNAME=${NIFI_SINGLE_USER_CREDENTIALS_USERNAME}
+      - SINGLE_USER_CREDENTIALS_PASSWORD=${NIFI_SINGLE_USER_CREDENTIALS_PASSWORD}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nifi_http.rule=Host(`${NIFI_NAME}`)"
+      - "traefik.http.routers.nifi_http.entrypoints=websecure"
+      - "traefik.http.routers.nifi_http.service=nifi"
+      - "traefik.http.routers.nifi_http.tls=true"
+      - "traefik.http.services.nifi.loadbalancer.server.scheme=https"
+      - "traefik.http.services.nifi.loadbalancer.server.port=${NIFI_WEB_HTTPS_PORT}"
+      - "traefik.docker.network=${COMPOSE_NETWORKNAME}"
+    volumes:
+      - type: volume
+        source: nifi-conf
+        target: /opt/nifi/current/conf
+      - type: volume
+        source: nifi-content
+        target: /opt/nifi/current/content_repository
+      - type: volume
+        source: nifi-db
+        target: /opt/nifi/current/database_repository
+      - type: volume
+        source: nifi-flowfile
+        target: /opt/nifi/current/flowfile_repository
+      - type: volume
+        source: nifi-provenance
+        target: /opt/nifi/current/provenance_repository
+      - type: volume
+        source: nifi-logs
+        target: /opt/nifi/current/logs
+      - type: volume
+        source: nifi-data
+        target: /opt/nifi/current/data
+    
+networks:
+    default:
+        name: "${COMPOSE_NETWORKNAME}"
+
+volumes:
+  nifi-conf:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '../data/nifi/conf'
+
+  nifi-content:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '../data/nifi/content'
+
+  nifi-db:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '../data/nifi/db'
+
+  nifi-flowfile:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '../data/nifi/flowfile'
+
+  nifi-provenance:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '../data/nifi/provenance'
+
+  nifi-logs:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '../data/nifi/logs'
+
+  nifi-data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '../data/nifi/data'
