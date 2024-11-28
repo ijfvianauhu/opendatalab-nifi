@@ -1,0 +1,9 @@
+.# Ignorar todos los archivos en el directorio
+etc/traefik/certs/*
+!etc/traefik/certs//README.md
+.env
+docker/.env
+data/nifi/*
+!data/nifi/README.md
+data/traefik/*
+!data/traefik/README.md
