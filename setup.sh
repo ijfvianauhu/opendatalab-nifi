@@ -179,6 +179,10 @@ docker_connect() {
   docker compose "${compose_files[@]}" exec -it ${container} /bin/sh
 } 
 
+create_volumns() {
+  script_dir=$(realpath $(dirname "$0"))
+   mkdir -p "$script_dir"/data/nifi/conf "$script_dir"/data/nifi/content "$script_dir"/data/nifi/data "$script_dir"/data/nifi/db "$script_dir"/data/nifi/flowfile "$script_dir"/data/nifi/logs "$script_dir"/data/nifi/provenance  
+}
 
 show_help() {
   echo "Usage: $(basename $0) [ARGUMENTS]"
@@ -201,7 +205,8 @@ main() {
 
   prepare_config
   export_image_tags
-
+  create_volumns
+  
   if [ "$cmd" = "start" ]; then
     # obtain_images
     generate_autosign_ssl_cert ${NIFI_NAME}
