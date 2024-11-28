@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -e
 
 COLOR_RED_BRIGHT='\033[1;31m'
@@ -7,38 +9,33 @@ NO_COLOR='\033[0m' # No Color
 
 #### Default values for environment variables
 
-COMPOSE_PROJECT_NAME="nifi-opendatalab2"
-COMPOSE_USER=1000
-COMPOSE_GRP=1000
-COMPOSE_NETWORKNAME="nifi-opendatalab2"
+export COMPOSE_PROJECT_NAME="nifi-opendatalab2"
+export COMPOSE_USER=1000
+export COMPOSE_GRP=1000
+export COMPOSE_NETWORKNAME="nifi-opendatalab2"
 
 # Taefik
 
-TRAEFIK_IMAGE_NAME=traefik
-TRAEFIK_ACTIVE_BRANCH="v3.0"
-TRAEFIK_NAME="proxy.opendatalab2.uhu.es"
-TRAEFIK_HTTP_PORT="80"
-TRAEFIK_HTTPS_PORT="443"
-TRAEFIK_LOG_LEVEL="DEBUG"
-TRAEFIK_ENABLE_DASHBOARD="true"
+export TRAEFIK_IMAGE_NAME=traefik
+export TRAEFIK_ACTIVE_BRANCH="v3.0"
+export TRAEFIK_NAME="proxy.opendatalab2.uhu.es"
+export TRAEFIK_HTTP_PORT="80"
+export TRAEFIK_HTTPS_PORT="443"
+export TRAEFIK_LOG_LEVEL="DEBUG"
+export TRAEFIK_ENABLE_DASHBOARD="true"
 
-# Creenciales de administrador para acceder al dashboard de traefik. Por defecto son
-# admin:password. Las puede cambiar ejectando el siguiente comando indicando un nuevo usuario y clave
-#
-# htpasswd -nb admin password
-TRAEFIK_ADMIN_USER="admin"
-TRAEFIK_ADMIN_PASSWORD='$apr1$CBkxfGFG$15w43pPGtrIDwtydX8e7O0'
+export TRAEFIK_ADMIN_USER="admin"
+export TRAEFIK_ADMIN_PASSWORD='$apr1$CBkxfGFG$15w43pPGtrIDwtydX8e7O0'
 
 # NIfi
 
-NIFI_IMAGE_NAME=apache/nifi
-NIFI_ACTIVE_BRANCH="v3.0"
-NIFI_NAME=nifi.opendatalab2.uhu.es
-NIFI_WEB_HTTP_PORT=8080
-NIFI_WEB_HTTPS_PORT=8443
-NIFI_SINGLE_USER_CREDENTIALS_USERNAME=admin
-NIFI_SINGLE_USER_CREDENTIALS_PASSWORD=ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB
-
+export NIFI_IMAGE_NAME=apache/nifi
+export NIFI_ACTIVE_BRANCH="2.0.0"
+export NIFI_NAME=nifi.opendatalab2.uhu.es
+export NIFI_WEB_HTTP_PORT=8080
+export NIFI_WEB_HTTPS_PORT=8443
+export NIFI_SINGLE_USER_CREDENTIALS_USERNAME=admin
+export NIFI_SINGLE_USER_CREDENTIALS_PASSWORD=ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB
 
 #### End Default values for environment variables
 
