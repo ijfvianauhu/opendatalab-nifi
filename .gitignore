@@ -1,4 +1,3 @@
-.# Ignorar todos los archivos en el directorio
 etc/traefik/certs/*
 !etc/traefik/certs//README.md
 .env
