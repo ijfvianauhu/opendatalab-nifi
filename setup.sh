@@ -157,13 +157,25 @@ logs() {
 }
 
 docker_shell() {
-  print_info "Running a shell in a new traefik container"
-  docker compose "${compose_files[@]}" run --rm traefik /bin/sh
+  container="traefik"
+
+  if [ "$#" -eq 2 ]; then
+    container=$1
+  fi
+  
+  print_info "Running a shell in a new ${container} container"
+  docker compose "${compose_files[@]}" run --rm ${container} /bin/sh
 }
 
 docker_connect() {
-  print_info "Executing a shell in traefik container"
-  docker compose "${compose_files[@]}" exec -it traefik /bin/sh
+  container="traefik"
+
+  if [ "$#" -eq 2 ]; then
+    container=$1
+  fi
+
+  print_info "Executing a shell in ${container} container"
+  docker compose "${compose_files[@]}" exec -it ${container} /bin/sh
 } 
 
 
@@ -172,10 +184,10 @@ show_help() {
   echo "arguments:"
   echo "  start      Inicia start "
   echo "  start-i    Inicia start interactivo "
-  echo "  stop       Destrute stack"
+  echo "  stop       Destruye stack"
   echo "  logs       Muestra los logs en el stack"
-  echo "  shell      Ejecuta una shell en un nuevo contenedor trapper"
-  echo "  connect    Se conecta a la instancia en execucion en trapper"
+  echo "  shell      Ejecuta una shell en un nuevo contenedor de traefik"
+  echo "  connect    Se conecta a la instancia en ejecución de traefik"
   echo "  restart    Reinicia el stack"
 
   # Add more options and descriptions as needed
@@ -204,10 +216,9 @@ main() {
   elif [ "$cmd" = "logs" ]; then
     logs
   elif [ "$cmd" = "shell" ]; then
-    generate_autosign_ssl_certs
-    docker_shell
+    docker_shell "$2"
   elif [ "$cmd" = "connect" ]; then
-    docker_connect    
+    docker_connect "$2"
   elif [ "$cmd" = "restart" ]; then
     restart 
   elif [ "$cmd" = "help" ]; then
