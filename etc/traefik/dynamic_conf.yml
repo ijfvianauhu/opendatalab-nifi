@@ -1,0 +1,41 @@
+# Dynamic Configuration
+http:
+  routers:
+    dashboard_https:
+      rule: Host(`{{env "PROXY_NAME"}}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      service: api@internal
+      entrypoints: websecure
+      tls: true
+      middlewares:
+        - auth
+    dashboard_http:
+      rule: Host(`{{env "PROXY_NAME"}}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      service: api@internal
+      entrypoints: web
+      middlewares:
+        - https_redirect
+
+  middlewares:
+    auth:
+      basicAuth:
+        users:
+          - "{{env "PROXY_ADMIN_USER"}}:{{env "PROXY_ADMIN_PASSWORD"}}"
+    https_redirect:
+      redirectscheme:
+        scheme: https
+        permanent: true
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/traefik/certs/nifi.opendatalab2.uhu.es.crt
+        keyFile: /etc/traefik/certs/nifi.opendatalab2.uhu.es.key
+  certificates:
+    - certFile: /etc/traefik/certs/nifi.opendatalab2.uhu.es.crt
+      keyFile: /etc/traefik/certs/nifi.opendatalab2.uhu.es.key
+      stores:
+        - default
+    - certFile: /etc/traefik/certs/proxy.opendatalab2.uhu.es.crt
+      keyFile: /etc/traefik/certs/proxy.opendatalab2.uhu.es.key
+      stores:
+        - default
