@@ -56,32 +56,16 @@ services:
       - "traefik.http.services.nifi.loadbalancer.server.port=${NIFI_WEB_HTTPS_PORT}"
       - "traefik.docker.network=${COMPOSE_NETWORKNAME}"
     volumes:
-      - type: volume
-        source: nifi-conf
-        target: /opt/nifi/current/conf
-      - type: volume
-        source: nifi-content
-        target: /opt/nifi/current/content_repository
-      - type: volume
-        source: nifi-db
-        target: /opt/nifi/current/database_repository
-      - type: volume
-        source: nifi-flowfile
-        target: /opt/nifi/current/flowfile_repository
-      - type: volume
-        source: nifi-provenance
-        target: /opt/nifi/current/provenance_repository
-      - type: volume
-        source: nifi-logs
-        target: /opt/nifi/current/logs
-      - type: volume
-        source: nifi-data
-        target: /opt/nifi/current/data
-    
+      - nifi-conf:/opt/nifi/nifi2-current/conf
+      - nifi-content:/opt/nifi/nifi2-current/content_repository
+      - nifi-db:/opt/nifi/nifi2-current/database_repository
+      - nifi-flowfile:/opt/nifi/nifi2-current/flowfile_repository
+      - nifi-provenance:/opt/nifi/nifi2-current/provenance_repository
+      - nifi-logs:/opt/nifi/nifi2-current/logs
+      - nifi-data:/opt/nifi/nifi2-current/data
 networks:
     default:
         name: "${COMPOSE_NETWORKNAME}"
-
 volumes:
   nifi-conf:
     driver: local
