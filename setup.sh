@@ -160,9 +160,9 @@ docker_shell() {
   container="traefik"
 
   if [ "$#" -eq 2 ]; then
-    container=$1
+    container=$2
   fi
-  
+
   print_info "Running a shell in a new ${container} container"
   docker compose "${compose_files[@]}" run --rm ${container} /bin/sh
 }
@@ -170,8 +170,9 @@ docker_shell() {
 docker_connect() {
   container="traefik"
 
+  echo $#
   if [ "$#" -eq 2 ]; then
-    container=$1
+    container=$2
   fi
 
   print_info "Executing a shell in ${container} container"
@@ -216,9 +217,9 @@ main() {
   elif [ "$cmd" = "logs" ]; then
     logs
   elif [ "$cmd" = "shell" ]; then
-    docker_shell "$2"
+    docker_shell "$@"
   elif [ "$cmd" = "connect" ]; then
-    docker_connect "$2"
+    docker_connect "$@"
   elif [ "$cmd" = "restart" ]; then
     restart 
   elif [ "$cmd" = "help" ]; then
