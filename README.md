@@ -93,6 +93,8 @@ Para configurar Nifi puedo establecer distintos valores para las siguientes vari
 * **NIFI_WEB_HTTPS_PORT**. Puerto para el protocolo https. Por defecto, `8443`.
 * **NIFI_SINGLE_USER_CREDENTIALS_USERNAME**. Usuario para acceder al entorno nifi. Por defecto, `admin`.
 * **NIFI_SINGLE_USER_CREDENTIALS_PASSWORD**. Clave del usuario que tiene acceso al entorno nifi. Por defecto, `ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB`.
+* **NIFI_MOUNT_VOLUMES**. Indica si se montan los volúmenes. Por defecto, `true`.
+* **NIFI_VOLUMES_DIR**. Directorio base desde donde se montaran los volúmenes.
 
 ## Ejemplo de fichero de configuración
 

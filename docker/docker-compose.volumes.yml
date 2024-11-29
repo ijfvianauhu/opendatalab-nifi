@@ -1,0 +1,63 @@
+volumes:
+  nifi-conf:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${NIFI_VOLUMES_DIR}/conf"
+
+  nifi-content:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${NIFI_VOLUMES_DIR}/content"
+
+  nifi-db:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${NIFI_VOLUMES_DIR}/db"
+
+  nifi-flowfile:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${NIFI_VOLUMES_DIR}/flowfile"
+
+  nifi-provenance:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${NIFI_VOLUMES_DIR}/provenance"
+
+  nifi-logs:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${NIFI_VOLUMES_DIR}/logs"
+
+  nifi-data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${NIFI_VOLUMES_DIR}/data"
+
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${MARIADB_NIFI_VOLUMES_DIR}/mysqldata"
+
+  mongodb_data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${MONGO_VOLUMES_DIR}/mongodbdata"

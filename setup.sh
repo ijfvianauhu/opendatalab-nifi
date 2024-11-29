@@ -13,6 +13,7 @@ export COMPOSE_PROJECT_NAME="nifi-opendatalab2"
 export COMPOSE_USER=1000
 export COMPOSE_GRP=1000
 export COMPOSE_NETWORKNAME="nifi-opendatalab2"
+export COMPOSE_MOUNT_VOLUMES=1
 
 # Taefik
 
@@ -36,6 +37,33 @@ export NIFI_WEB_HTTP_PORT=8080
 export NIFI_WEB_HTTPS_PORT=8443
 export NIFI_SINGLE_USER_CREDENTIALS_USERNAME=admin
 export NIFI_SINGLE_USER_CREDENTIALS_PASSWORD=ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB
+export NIFI_VOLUMES_DIR=../data/nifi
+
+# mariadb
+export MARIADB_IMAGE_NAME=mariadb
+export MARIADB_ACTIVE_BRANCH="10.5"
+export MARIADB_NAME=mariadb.opendatalab2.uhu.es
+export MARIADB_PORT=3306
+export MARIADB_ROOT_PASSWORD=ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB
+export MARIADB_VOLUMES_DIR="../data/mariadb"
+
+# phpmyadmin
+export PM_IMAGE_NAME=phpmyadmin/phpmyadmin
+export PM_ACTIVE_BRANCH="5.1"
+export PM_NAME=phpmyadmin.opendatalab2.uhu.es
+
+# mongo
+export MONGO_IMAGE_NAME=mongo
+export MONGO_ACTIVE_BRANCH="4.4"
+export MONGO_NAME=mongo.opendatalab2.uhu.es
+export MONGO_INITDB_ROOT_USERNAME=root   # Usuario administrador para MongoDB
+export MONGO_INITDB_ROOT_PASSWORD=example # Contraseña del usuario administrador
+export MONGO_VOLUMES_DIR=../data/mongo
+
+# mongo-express
+export ME_IMAGE_NAME=mongo-express
+export ME_ACTIVE_BRANCH="0.54"
+export ME_NAME=mongo-express.opendatalab2.uhu.es
 
 #### End Default values for environment variables
 
@@ -122,25 +150,39 @@ aggregate_compose_files() {
   done
 }
 
+configure_volumes() {
+  if [ "${COMPOSE_MOUNT_VOLUMES}" = 1 ]; then
+
+    if [ -z "$VOLUMES_DIR" ]; then
+      VOLUMES_DIR="$(pwd)/volumes"
+      print_warn "VOLUMES_DIR not set, defaulting to ${VOLUMES_DIR}"
+    fi
+
+    print_ok "Mounting volumes to ${VOLUMES_DIR}"
+    export VOLUMES_DIR
+    fragments+=("volumes")
+  else
+    print_warn "Using named volumes for storing data"
+  fi
+}
+
 prepare_config() {
   load_dotenv
   check_required_env_variables
-
   fragments+=("base")
-
-
+  #configure_volumes
   aggregate_compose_files
 }
 
 start() {
   print_info "Compose files: ${compose_files[*]}"
-  print_info "Traefik dashboard will be listening in https://${PROXY_NAME}:${HTTPS_PORT}/dashboard/. User credentials are stored in /etc/traefik/dynamic_conf.yml file"
+  print_info "Traefik dashboard will be listening in https://${TRAEFIK_NAME}:${TRAEFIK_HTTPS_PORT}/dashboard/. User credentials are stored in /etc/traefik/dynamic_conf.yml file"
   docker compose "${compose_files[@]}" up --remove-orphans
 }
 
 start_detached() {
   print_info "Compose files: ${compose_files[*]}"
-  print_info "Traefik dashboard will be listening in https://${PROXY_NAME}:${HTTPS_PORT}/dashboard/. User credentials are stored in /etc/traefik/dynamic_conf.yml file"
+  print_info "Traefik dashboard will be listening in https://${TRAEFIK_NAME}:${TRAEFIK_HTTPS_PORT}/dashboard/. User credentials are stored in /etc/traefik/dynamic_conf.yml file"
   docker compose "${compose_files[@]}" up -d --remove-orphans
 }
 
@@ -181,8 +223,19 @@ docker_connect() {
 
 create_volumns() {
   script_dir=$(realpath $(dirname "$0"))
-   mkdir -p "$script_dir"/data/nifi/conf "$script_dir"/data/nifi/content "$script_dir"/data/nifi/data "$script_dir"/data/nifi/db "$script_dir"/data/nifi/flowfile "$script_dir"/data/nifi/logs "$script_dir"/data/nifi/provenance  
+   mkdir -p "$script_dir"/data/nifi/conf
+   mkdir -p "$script_dir"/data/nifi/content
+   mkdir -p "$script_dir"/data/nifi/data
+   mkdir -p "$script_dir"/data/nifi/db
+   mkdir -p "$script_dir"/data/nifi/flowfile
+   mkdir -p "$script_dir"/data/nifi/logs
+   mkdir -p "$script_dir"/data/nifi/provenance
+   mkdir -p "$script_dir"/data/mariadb
+   mkdir -p "$script_dir"/data/mongo
 }
+
+
+
 
 show_help() {
   echo "Usage: $(basename $0) [ARGUMENTS]"
@@ -211,11 +264,17 @@ main() {
     # obtain_images
     generate_autosign_ssl_cert ${NIFI_NAME}
     generate_autosign_ssl_cert ${TRAEFIK_NAME}
+    generate_autosign_ssl_cert ${PM_NAME}
+    generate_autosign_ssl_cert ${ME_NAME}
+
     start_detached
   elif [ "$cmd" = "start-i" ]; then
     # obtain_images
     generate_autosign_ssl_cert ${NIFI_NAME}
     generate_autosign_ssl_cert ${TRAEFIK_NAME}
+    generate_autosign_ssl_cert ${PM_NAME}
+    generate_autosign_ssl_cert ${ME_NAME}
+
     start
   elif [ "$cmd" = "stop" ]; then
     stop

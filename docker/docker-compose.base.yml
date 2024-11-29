@@ -63,6 +63,66 @@ services:
       - nifi-provenance:/opt/nifi/nifi2-current/provenance_repository
       - nifi-logs:/opt/nifi/nifi2-current/logs
       - nifi-data:/opt/nifi/nifi2-current/data
+
+  mariadb:
+    image: ${MARIADB_IMAGE_NAME}:${MARIADB_ACTIVE_BRANCH}
+    hostname: ${MARIADB_NAME}
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      # MARIADB_PORT=3306
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: "${PM_IMAGE_NAME}:${PM_ACTIVE_BRANCH}"
+    hostname: "${PM_NAME}"
+    restart: always
+    environment:
+      PMA_HOST: mariadb            # Nombre del servicio MariaDB (debe coincidir)
+      UPLOAD_LIMIT: 1024M           # Tamaño máximo de subida de archivos
+    expose:
+      - "80"                  # phpMyAdmin estará disponible en http://localhost:8080
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadmin_http.rule=Host(`${PM_NAME}`)"
+      - "traefik.http.routers.phpmyadmin_http.entrypoints=websecure"
+      - "traefik.http.routers.phpmyadmin_http.service=phpmyadmin"
+      - "traefik.http.routers.phpmyadmin_http.tls=true"
+      - "traefik.http.services.phpmyadmin.loadbalancer.server.scheme=http"
+      - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
+      - "traefik.docker.network=${COMPOSE_NETWORKNAME}"
+
+  mongodb:
+    image: "${MONGO_IMAGE_NAME}:${MONGO_ACTIVE_BRANCH}"
+    container_name: "${MONGO_NAME}"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "${MONGO_INITDB_ROOT_USERNAME}"   # Usuario administrador para MongoDB
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_INITDB_ROOT_PASSWORD}" # Contraseña del usuario administrador
+    volumes:
+      - mongodb_data:/data/db
+
+  mongo-express:
+    image: "${ME_IMAGE_NAME}:${ME_ACTIVE_BRANCH}"
+    hostname: "${ME_NAME}"
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: "${MONGO_INITDB_ROOT_USERNAME}"     # Usuario administrador (mismo que MongoDB)
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example # Contraseña del administrador
+      ME_CONFIG_MONGODB_SERVER: mongodb        # Nombre del servicio MongoDB (debe coincidir)
+    expose:
+      - "8081"                            # Mongo Express estará disponible en http://localhost:8081
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mongo-express_http.rule=Host(`${ME_NAME}`)"
+      - "traefik.http.routers.mongo-express_http.entrypoints=websecure"
+      - "traefik.http.routers.mongo-express_http.service=mongo-express"
+      - "traefik.http.routers.mongo-express_http.tls=true"
+      - "traefik.http.services.mongo-express.loadbalancer.server.scheme=http"
+      - "traefik.http.services.mongo-express.loadbalancer.server.port=8081"
+      - "traefik.docker.network=${COMPOSE_NETWORKNAME}"
+
 networks:
     default:
         name: "${COMPOSE_NETWORKNAME}"
@@ -72,46 +132,60 @@ volumes:
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '../data/nifi/conf'
+      device: "${NIFI_VOLUMES_DIR}/conf"
 
   nifi-content:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '../data/nifi/content'
+      device: "${NIFI_VOLUMES_DIR}/content"
 
   nifi-db:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '../data/nifi/db'
+      device: "${NIFI_VOLUMES_DIR}/db"
 
   nifi-flowfile:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '../data/nifi/flowfile'
+      device: "${NIFI_VOLUMES_DIR}/flowfile"
 
   nifi-provenance:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '../data/nifi/provenance'
+      device: "${NIFI_VOLUMES_DIR}/provenance"
 
   nifi-logs:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '../data/nifi/logs'
+      device: "${NIFI_VOLUMES_DIR}/logs"
 
   nifi-data:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '../data/nifi/data'
+      device: "${NIFI_VOLUMES_DIR}/data"
+
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${MARIADB_VOLUMES_DIR}/mysqldata"
+
+  mongodb_data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: "${MONGO_VOLUMES_DIR}/mongodbdata"
