@@ -96,6 +96,39 @@ Para configurar Nifi puedo establecer distintos valores para las siguientes vari
 * **NIFI_MOUNT_VOLUMES**. Indica si se montan los volúmenes. Por defecto, `true`.
 * **NIFI_VOLUMES_DIR**. Directorio base desde donde se montaran los volúmenes.
 
+## Variables mariadb
+
+Para configurar mariadn puede establecer distintos valores para las siguientes variables:
+
+* **MARIADB_IMAGE_NAME**: Nombre de la imagen mariadb a usar- Por defecto `mariadb`
+* **MARIADB_ACTIVE_BRANCH**: Versión de mariadb a instalar. Por defecto, `10.5`
+* **MARIADB_NAME**: Dominio que le asociaresmos a la instancia de mariadb creatda. Por defceto, `mariadb.opendatalab2.uhu.es`
+* **MARIADB_PORT**: Puerto en el que escuchará la instancia de mariadb  creada. Por defecto, `3306`
+* **MARIADB_ROOT_PASSWORD**: Clave de root. Por defecto, `=ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB`
+* **MARIADB_VOLUMES_DIR**´: Localización del volumen en mel que se alcenaran los datos de mariadb. Por defecto, `../data/mariadb`
+
+## Variables phpmydmin
+
+PM_IMAGE_NAME=phpmyadmin/phpmyadmin
+PM_ACTIVE_BRANCH="5.1"
+PM_NAME=phpmyadmin.opendatalab2.uhu.es
+
+
+## Variables mongodb
+
+MONGO_IMAGE_NAME=mongo
+MONGO_ACTIVE_BRANCH="4.4"
+MONGO_NAME=mongo.opendatalab2.uhu.es
+MONGO_INITDB_ROOT_USERNAME=root   # Usuario administrador para MongoDB
+MONGO_INITDB_ROOT_PASSWORD=example # Contraseña del usuario administrador
+MONGO_VOLUMES_DIR=../data/mongo
+
+
+## Variables mongo-express
+
+ME_IMAGE_NAME=mongo-express
+ME_ACTIVE_BRANCH="0.54"
+ME_NAME=mongo-express.opendatalab2.uhu.es
 ## Ejemplo de fichero de configuración
 
 A continuación se muestra el contenido de un posible fichero `.env`:
